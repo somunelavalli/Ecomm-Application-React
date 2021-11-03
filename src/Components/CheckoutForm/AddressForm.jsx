@@ -100,7 +100,7 @@ const AddressForm = ({ checkoutToken, next }) => {
               <FormInput required name="address" label="Address" />
               <FormInput required name="email" label="Email" />
               <FormInput required name="city" label="City" />
-              <FormInput required name="Pincode" label="Pincode" />
+              <FormInput required name="pincode" label="Pincode" />
               <Grid item xs={12} sm={6}>
                 <InputLabel>Select Country</InputLabel>
                 <Select
