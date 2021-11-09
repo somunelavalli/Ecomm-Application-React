@@ -15,49 +15,57 @@ const PaymentForm = ({
   nextStep,
   shippingData,
 }) => {
+  let rid = "";
   const finalAmount = parseFloat(
     checkoutToken.live.shipping.price.raw + checkoutToken.live.subtotal.raw
   ).toFixed(2);
   const launchRazorpay = async (event) => {
-    event.preventDefault();
+    console.log("Console1");
     const options = {
       key: process.env.REACT_APP_RAZORPAY_PUBLIC_KEY,
-      amount: parseFloat(finalAmount * 100),
+      amount: finalAmount * 100,
       currency: "INR",
       name: "Somu E-Comm APP",
       description: "E-Comm APP",
-      handler: (response) => {
-        // payment_id: response.razorpay_payment_id;
+      handler: function (response) {
+        console.log("Console2");
+        console.log(response.razorpay_payment_id);
+        rid = response.razorpay_payment_id;
+        alert(response.razorpay_order_id);
+        alert(response.razorpay_signature);
+        const orderData = {
+          line_items: checkoutToken.live.line_items,
+          customer: {
+            firstname: shippingData.firstName,
+            lastname: shippingData.lastName,
+            email: shippingData.email,
+          },
+          shipping: {
+            name: "Primary",
+            street: shippingData.address,
+            town_city: shippingData.city,
+            county_state: shippingData.shippingSubdivision,
+            postal_zip_code: shippingData.pincode,
+            country: shippingData.shippingCountry,
+          },
+          fulfillment: { shipping_method: shippingData.shippingOption },
+          payment: {
+            gateway: "razorpay",
+            razorpay: {
+              payment_id: rid,
+            },
+          },
+        };
+        onCaptureCheckout(checkoutToken.id, orderData);
       },
     };
+    console.log(options);
+    console.log("Console3");
     let razorpay = new window.Razorpay(options);
-    razorpay.open();
-    const orderData = {
-      line_items: checkoutToken.live.line_items,
-      customer: {
-        firstname: shippingData.firstName,
-        lastname: shippingData.lastName,
-        email: shippingData.email,
-      },
-      shipping: {
-        name: "Primary",
-        street: shippingData.address,
-        town_city: shippingData.city,
-        county_state: shippingData.shippingSubdivision,
-        postal_zip_code: shippingData.pincode,
-        country: shippingData.shippingCountry,
-      },
-      fulfillment: { shipping_method: shippingData.shippingOption },
-      payment: {
-        gateway: "razorpay",
-        razorpay: {
-          // payment_method_id: razorpay_payment_id,
-        },
-      },
-    };
-    console.log(orderData);
-    onCaptureCheckout(checkoutToken.id, orderData);
+    console.log("Console4");
     nextStep();
+    razorpay.open();
+    event.preventDefault();
   };
 
   return (
