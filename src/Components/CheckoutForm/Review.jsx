@@ -2,6 +2,13 @@ import React from "react";
 import { Typography, List, ListItem, ListItemText } from "@material-ui/core";
 
 const Review = ({ checkoutToken }) => {
+  console.log(checkoutToken.live);
+
+  const finalAmount = parseFloat(
+    checkoutToken.live.shipping.price.raw + checkoutToken.live.subtotal.raw
+  ).toFixed(2);
+  console.log(finalAmount);
+
   return (
     <>
       <Typography variant="h6" gutterBottom>
@@ -20,9 +27,15 @@ const Review = ({ checkoutToken }) => {
           </ListItem>
         ))}
         <ListItem style={{ padding: "10px 0" }}>
+          <ListItemText primary="Shipping Cost" />
+          <Typography variant="subtitle1">
+            {checkoutToken.live.shipping.price.formatted_with_symbol}
+          </Typography>
+        </ListItem>
+        <ListItem style={{ padding: "10px 0" }}>
           <ListItemText primary="Total" />
           <Typography variant="subtitle1" style={{ fontWeight: 700 }}>
-            {checkoutToken.live.subtotal.formatted_with_symbol}
+            ₹{finalAmount}
           </Typography>
         </ListItem>
       </List>

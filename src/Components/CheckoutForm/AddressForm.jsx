@@ -11,6 +11,7 @@ import { useForm, FormProvider } from "react-hook-form";
 import FormInput from "./Checkout/customTextField";
 import { commerce, Commerce } from "../../lib/Commerce";
 import { Link } from "react-router-dom";
+import { loadStripe } from "@stripe/stripe-js";
 
 const AddressForm = ({ checkoutToken, next }) => {
   const [shippingCountries, setShippingCountries] = useState([]);
@@ -33,6 +34,7 @@ const AddressForm = ({ checkoutToken, next }) => {
   const options = shippingOptions.map((sO) => ({
     id: sO.id,
     label: `${sO.description} - (${sO.price.formatted_with_symbol})`,
+    price: sO.price,
   }));
 
   const fetchShippingCountries = async (checkoutTokenId) => {
@@ -64,8 +66,10 @@ const AddressForm = ({ checkoutToken, next }) => {
     );
     setShippingOptions(options);
     setShippingOption(options[0].id);
+    console.log(options);
   };
   useEffect(() => {
+    // console.log(JSON.stringify(checkoutToken));
     fetchShippingCountries(checkoutToken.id);
   }, []);
   useEffect(() => {
@@ -79,6 +83,16 @@ const AddressForm = ({ checkoutToken, next }) => {
         shippingSubdivision
       );
   }, [shippingSubdivision]);
+  // useEffect(() => {
+  //   if (shippingOption) {
+  //     console.log(shippingOption);
+
+  //   }
+  // }, [shippingOption]);
+  const setShippingPrice = (priceData) => {
+    console.log(priceData);
+    checkoutToken.live.shipping.price = priceData.price;
+  };
 
   return (
     <>
@@ -137,7 +151,11 @@ const AddressForm = ({ checkoutToken, next }) => {
                   onChange={(e) => setShippingOption(e.target.value)}
                 >
                   {options.map((option) => (
-                    <MenuItem key={option.id} value={option.id}>
+                    <MenuItem
+                      onClick={(e) => setShippingPrice(option)}
+                      key={option.id}
+                      value={option.id}
+                    >
                       {option.label}
                     </MenuItem>
                   ))}
